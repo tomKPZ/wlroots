@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 #include <assert.h>
 #include <stdlib.h>
+#include <wlr/backend/drm.h>
 #include <wlr/interfaces/wlr_output.h>
 #include <wlr/types/wlr_matrix.h>
 #include <wlr/types/wlr_surface.h>
@@ -365,6 +366,10 @@ void wlr_output_init(struct wlr_output *output, struct wlr_backend *backend,
 	if (no_hardware_cursors != NULL && strcmp(no_hardware_cursors, "1") == 0) {
 		wlr_log(WLR_DEBUG,
 			"WLR_NO_HARDWARE_CURSORS set, forcing software cursors");
+		output->software_cursor_locks = 1;
+	}
+	// Workaround https://github.com/swaywm/wlroots/issues/1791
+	if (wlr_backend_is_drm(backend)) {
 		output->software_cursor_locks = 1;
 	}
 
